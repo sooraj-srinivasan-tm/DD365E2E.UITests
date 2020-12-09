@@ -1,0 +1,46 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+RUN apt-get update
+RUN apt-get install -y gss-ntlmssp nuget wget
+
+ARG APPLICATION_NAME
+ARG TEST_CATEGORY
+ENV GST_APPLICATION_NAME=${APPLICATION_NAME}
+ENV TESTCATEGORY=${TEST_CATEGORY}
+
+#Install Google Chrome
+#Check available versions here: https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
+ARG CHROME_VERSION="85.0.4183.83-1"
+ARG CHROMEDRIVER_VERSION="85.0.4183.8700"
+
+RUN wget --no-verbose -O /tmp/chrome.deb http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb \
+  && apt install -y /tmp/chrome.deb \
+  && rm /tmp/chrome.deb
+
+#Update Nuget
+RUN nuget update -self
+RUN dotnet nuget add source http://www.nuget.org/api/v2/ --name nuget_v2
+RUN dotnet nuget add source https://gstoyota.jfrog.io/artifactory/api/nuget/v3/nuget --name Artifactory --username nuget-view --password Toyota2020 --store-password-in-clear-text
+
+#Copy sourcecode into image and do compilation
+RUN mkdir /src
+COPY qa/ /src
+WORKDIR /src
+RUN dotnet restore ${APPLICATION_NAME}.sln
+
+#Setup chromedriver and run smoke tests
+WORKDIR /root/.nuget/packages
+RUN cp ./selenium.webdriver.chromedriver/${CHROMEDRIVER_VERSION}/driver/linux64/chromedriver /usr/bin/chromedriver
+RUN chmod +x /usr/bin/chromedriver
+WORKDIR /src
+
+#specsync setup
+RUN dotnet new tool-manifest
+RUN dotnet tool install SpecSync.AzureDevOps
+ADD qa/*/*.csproj /src/
+ADD qa/*/specsync.json /src/
+
+#dotnet test and specsync publish CMD commands are in start.sh file
+ADD qa/publishTestResults.sh /src
+RUN chmod +x /src/publishTestResults.sh
+CMD ["/src/publishTestResults.sh"]
+

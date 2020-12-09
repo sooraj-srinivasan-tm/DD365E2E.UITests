@@ -1,0 +1,11 @@
+﻿{
+  "bindingCulture": { "language": "en-us" },
+  "language": { "feature": "en-us" },
+  "DefaultUrl": "https://idp.dev.gstoyota.com/tmna-new?RelayState=https://dealer.rti.qa.toyota.com/inventory",
+  "UserName": "42323_dd365",
+  "Password": "Tundra2020",
+  // chrome //  IE  // firefox  // chromeHeadless
+  "Browser": "chrome",
+  "DatabaseConnectionString": "data source=172.20.83.128;Initial Catalog=GSTAuthZ;User Id=ddadmin;Password=iled4"
+
+}

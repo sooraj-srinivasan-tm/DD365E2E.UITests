@@ -1,0 +1,33 @@
+﻿{
+  "$schema": "http://schemas.specsolutions.eu/specsync4azuredevops-config-latest.json",
+
+  "remote": {
+    "projectUrl": "https://gstqa.visualstudio.com/Jira%20TFS%20Integraiton",
+    "user": "6l6xsfeuzquwr4s6smpru6dvn572vdoyyldjuqhtw6mjprfbe3xq",
+    "testSuite": {
+      "id": 511
+    }
+  },
+
+  "synchronization": {
+    "automation": {
+      "enabled": true,
+      "testExecutionStrategy": "assemblyBasedExecution"
+    }
+  },
+  "publishTestResults": {
+    "testConfiguration": {
+      "name": "Windows 10"
+    },
+    "runComment": "Acceptance test results",
+    "runName": "automation",
+    "testResultComment": "runByAutomation"
+  },
+  "local": {
+    "featureFileSource": {
+      "type": "projectFile",
+      "filePath": "DD365E2E.UITests.csproj"
+    },
+    "tags": "not (@ignore or @planned)"
+  }
+}
